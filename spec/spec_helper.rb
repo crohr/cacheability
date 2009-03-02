@@ -2,7 +2,7 @@ require 'spec'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 
-require 'cacheability'
+require File.dirname(__FILE__) + '/../lib/cacheability'
 
 Spec::Runner.configure do |config|
   

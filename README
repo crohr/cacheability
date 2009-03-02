@@ -1,5 +1,28 @@
-cacheability============
-Description goes here.
+Cacheability
+============
+A gem that makes client-side caching of HTTP requests a no-brainer. It is built upon the Rack:Cache gem from Ryan Tomayko.
+
+Cached data can be stored in heap, file or memcached. See the Rack::Cache documentation (http://tomayko.com/src/rack-cache/) for more information.
+
+Installation
+============
+  gem install cryx-cacheability
+  
+Usage
+=====
+  require 'cacheability/restclient'
+  resource = RestClient::CacheableResource.new('http://some/cacheable/resource', :cache => {:metastore => 'file:/tmp/cache/meta', :entitystore => 'file:/tmp/cache/body'})
+  puts resource.get # get from remote server, and cache if possible
+  ...
+  puts resource.get # get from cache, if still fresh.
+
+Supported libraries
+===================
+* rest-client
+
+Dependencies
+============
+* rack-cache
 
 COPYRIGHT
 =========
