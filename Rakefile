@@ -9,6 +9,7 @@ begin
     s.homepage = "http://github.com/cryx/cacheability"
     s.description = "TODO"
     s.authors = ["Cyril Rohr"]
+    s.add_dependency "rack-cache"
   end
 rescue LoadError
   puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"

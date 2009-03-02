@@ -52,5 +52,14 @@ describe RestClient::CacheableResource do
       response = @resource.call(@env.merge({'HTTP_ADDITIONAL_HEADER' => 'whatever'}))
       response.should == [304, {}, ""]
     end
+    
+    it "should render a RestClient::Response even when the data is coming from the cache" do
+      @resource.cache.should_receive(:call).and_return([200, {'ADDITIONAL_HEADER' => 'whatever'}, "body"])
+      response = @resource.get({'HTTP_ADDITIONAL_HEADER' => 'whatever'}, true)
+      response.should be_is_a(RestClient::Response)
+      response.code.should == 200
+      response.headers.should == {:ADDITIONAL_HEADER => 'whatever'}
+      response.to_s.should == "body"
+    end
   end
 end

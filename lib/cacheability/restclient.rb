@@ -2,6 +2,18 @@ require 'restclient'
 require 'rack/cache'
 
 module RestClient
+  # A class that mocks the behaviour of a Net::HTTPResponse class.
+  # It is required since RestClient::Response must be initialized with a class that responds to :code and :to_hash.
+  class MockHTTPResponse
+    attr_reader :code, :headers, :body
+    def initialize(rack_response)
+      @code, @headers, @body = rack_response
+    end
+    def to_hash
+      @headers
+    end    
+  end
+  
   class CacheableResource < Resource
     attr_reader :cache
     CACHE_DEFAULT_OPTIONS = {}.freeze
@@ -18,6 +30,7 @@ module RestClient
         uri_path_split = uri.path.split("/")
         path_info = (last_part = uri_path_split.pop) ? "/"+last_part : ""
         script_name = uri_path_split.join("/")
+        # minimal rack spec
         env = { 
           "REQUEST_METHOD" => 'GET',
           "SCRIPT_NAME" => script_name,
@@ -29,7 +42,8 @@ module RestClient
         debeautify_headers(additional_headers).each do |key, value|
           env.merge!("HTTP_"+key.to_s.gsub("-", "_").upcase => value)
         end
-        cache.call(env)
+        response = MockHTTPResponse.new(cache.call(env))
+        RestClient::Response.new(response.body.to_s, response)
       else
         super(additional_headers)
       end
