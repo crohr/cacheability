@@ -9,7 +9,7 @@ module RestClient
     def initialize(rack_response)
       @code, @headers, io = rack_response
       @body = ""
-      io.each{ |block| @body << block }
+      io.each{|block| @body << block}
       io.close if io.respond_to?(:close)
     end
     
@@ -67,6 +67,8 @@ module RestClient
   		end
     end
   
+    # Follows the SPEC of Rack 1.0: the returned body is always an array of string
+    #
     def call(env)
       http_headers = env.inject({}) do |out, (header, value)| 
         if header =~ /HTTP_/
@@ -76,9 +78,9 @@ module RestClient
       end
       response = get(debeautify_headers(http_headers), pass_through_cache=false)
       response.headers.delete(:x_content_digest) # don't know why, but it seems to make the validation fail if kept...
-      [response.code, debeautify_headers( response.headers ), response.to_s]
+      [response.code, debeautify_headers( response.headers ), [response.to_s]]
     rescue RestClient::NotModified => e
-      [304, e.response.to_hash, ""]
+      [304, e.response.to_hash, [""]]
     end
   end
 end
