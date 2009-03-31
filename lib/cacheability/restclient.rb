@@ -7,8 +7,12 @@ module RestClient
   class MockHTTPResponse
     attr_reader :code, :headers, :body
     def initialize(rack_response)
-      @code, @headers, @body = rack_response
+      @code, @headers, io = rack_response
+      @body = ""
+      io.each{ |block| @body << block }
+      io.close if io.respond_to?(:close)
     end
+    
     def to_hash
       @headers
     end    
@@ -37,13 +41,20 @@ module RestClient
           "PATH_INFO" => path_info,
           "QUERY_STRING" => uri.query,
           "SERVER_NAME" => uri.host,
-          "SERVER_PORT" => uri.port.to_s
+          "SERVER_PORT" => uri.port.to_s,
+          "rack.version" => Rack::VERSION,
+          "rack.run_once" => false,
+          "rack.multithread" => true,
+          "rack.multiprocess" => true,
+          "rack.url_scheme" => uri.scheme,
+          "rack.input" => StringIO.new,
+          "rack.errors" => StringIO.new   # Rack-Cache writes errors into this field
         }
         debeautify_headers(additional_headers).each do |key, value|
           env.merge!("HTTP_"+key.to_s.gsub("-", "_").upcase => value)
         end
         response = MockHTTPResponse.new(cache.call(env))
-        RestClient::Response.new(response.body.to_s, response)
+        RestClient::Response.new(response.body, response)
       else
         super(additional_headers)
       end
@@ -66,9 +77,8 @@ module RestClient
       response = get(debeautify_headers(http_headers), pass_through_cache=false)
       response.headers.delete(:x_content_digest) # don't know why, but it seems to make the validation fail if kept...
       [response.code, debeautify_headers( response.headers ), response.to_s]
-    rescue RestClient::NotModified
-      # should be modified to include response headers when the rest-client gem is up to date
-      [304, {}, ""]
+    rescue RestClient::NotModified => e
+      [304, e.response.to_hash, ""]
     end
   end
 end

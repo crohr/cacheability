@@ -7,7 +7,7 @@ begin
     s.summary = %Q{TODO}
     s.email = "cyril.rohr@irisa.fr"
     s.homepage = "http://github.com/cryx/cacheability"
-    s.description = "TODO"
+    s.description = "A gem that makes client-side caching of HTTP requests a no-brainer. It is built upon the Rack:Cache gem from Ryan Tomayko."
     s.authors = ["Cyril Rohr"]
     s.add_dependency "rack-cache"
   end

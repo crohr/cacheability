@@ -11,14 +11,25 @@ Installation
 Usage
 =====
   require 'cacheability/restclient'
-  resource = RestClient::CacheableResource.new('http://some/cacheable/resource', :cache => {:metastore => 'file:/tmp/cache/meta', :entitystore => 'file:/tmp/cache/body'})
-  puts resource.get # get from remote server, and cache if possible
-  ...
-  puts resource.get # get from cache, if still fresh.
+  resource = RestClient::CacheableResource.new(  'http://some/cacheable/resource', 
+                                                  :cache => { :metastore => 'file:/tmp/cache/meta', 
+                                                              :entitystore => 'file:/tmp/cache/body' } 
+                                              )
+  resource.get # get from remote server, and cache if possible
+  # ...
+  resource.get # get from cache, if still fresh.
+  # ...
+  resource.get(:cache_control => 'no-cache') # explicitly tells to bypass the cache
+  # ...
+
+Do yourself a favor and read: 
+* the HTTP specification related to HTTP caching - http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html
+* Things Caches Do - http://tomayko.com/writings/things-caches-do
+
 
 Supported libraries
 ===================
-* rest-client
+* rest-client > 0.9
 
 Dependencies
 ============

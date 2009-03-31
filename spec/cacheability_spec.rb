@@ -1,5 +1,7 @@
 require File.dirname(__FILE__) + '/spec_helper'
 require 'restclient'
+require File.dirname(__FILE__) + '/../lib/cacheability/restclient'
+
 
 describe RestClient::CacheableResource do
   require File.dirname(__FILE__) + '/../lib/cacheability/restclient'
@@ -18,6 +20,8 @@ describe RestClient::CacheableResource do
   describe "correctly instantiated" do
     before do
       @mock_cache = mock('rack-cache singleton')
+      @mock_rack_errors = mock('string io')
+      @mock_304_net_http_response = mock('http response', :code => 304, :body => "", :to_hash => {'header1' => 'value1'})
       Rack::Cache.stub!(:new).and_return(@mock_cache)
       @env = {
         'REQUEST_METHOD' => 'GET',
@@ -31,7 +35,7 @@ describe RestClient::CacheableResource do
     end
     
     it "should pass through the cache" do
-      @resource.cache.should_receive(:call).with( hash_including( @env.merge({'HTTP_ADDITIONAL_HEADER' => 'whatever'}) ) )
+      @resource.cache.should_receive(:call).with( hash_including( @env.merge({'HTTP_ADDITIONAL_HEADER' => 'whatever'}) ) ).and_return([200, {}, "response body"])
       @resource['/?q1=a&q2=b'].get(:additional_header => 'whatever')
     end
   
@@ -48,9 +52,9 @@ describe RestClient::CacheableResource do
     end
     
     it "should return a 304 not modified response if the call to the backend returned a 304 not modified response" do
-      @resource.should_receive(:get).with({'ADDITIONAL-HEADER' => 'whatever'}, false).and_raise(RestClient::NotModified)
+      @resource.should_receive(:get).with({'ADDITIONAL-HEADER' => 'whatever'}, false).and_raise(RestClient::NotModified.new(@mock_304_net_http_response))
       response = @resource.call(@env.merge({'HTTP_ADDITIONAL_HEADER' => 'whatever'}))
-      response.should == [304, {}, ""]
+      response.should == [304, {"header1"=>"value1"}, ""]
     end
     
     it "should render a RestClient::Response even when the data is coming from the cache" do
