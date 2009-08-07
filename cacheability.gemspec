@@ -32,6 +32,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/cryx/cacheability}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
+  s.rubyforge_project = %q{cacheability}
   s.rubygems_version = %q{1.3.2}
   s.summary = %q{A gem that makes client-side caching of HTTP requests a no-brainer. Replace your calls to RestClient::Resource.new with RestClient::CacheableResource.new and the caching is taken care of for you ! Supports heap, file and memcache storage.}
   s.test_files = [
