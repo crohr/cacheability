@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Cyril Rohr"]
   s.date = %q{2009-08-07}
-  s.description = %q{A gem that makes client-side caching of HTTP requests a no-brainer. It is built upon the Rack:Cache gem from Ryan Tomayko.}
+  s.description = %q{Transparent caching for your HTTP requests (heap, file, memcache). Built-in support for RestClient. Built upon Rack::Cache.}
   s.email = %q{cyril.rohr@irisa.fr}
   s.extra_rdoc_files = [
     "LICENSE",
@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.2}
-  s.summary = %q{TODO}
+  s.summary = %q{A gem that makes client-side caching of HTTP requests a no-brainer. Replace your calls to RestClient::Resource.new with RestClient::CacheableResource.new and the caching is taken care of for you ! Supports heap, file and memcache storage.}
   s.test_files = [
     "spec/cacheability_spec.rb",
      "spec/spec_helper.rb"

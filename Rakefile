@@ -4,10 +4,10 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |s|
     s.name = "cacheability"
-    s.summary = %Q{TODO}
+    s.summary = %Q{A gem that makes client-side caching of HTTP requests a no-brainer. Replace your calls to RestClient::Resource.new with RestClient::CacheableResource.new and the caching is taken care of for you ! Supports heap, file and memcache storage.}
     s.email = "cyril.rohr@irisa.fr"
     s.homepage = "http://github.com/cryx/cacheability"
-    s.description = "A gem that makes client-side caching of HTTP requests a no-brainer. It is built upon the Rack:Cache gem from Ryan Tomayko."
+    s.description = "Transparent caching for your HTTP requests (heap, file, memcache). Built-in support for RestClient. Built upon Rack::Cache."
     s.authors = ["Cyril Rohr"]
     s.add_dependency "rack-cache"
   end
