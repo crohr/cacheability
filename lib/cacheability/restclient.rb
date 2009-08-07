@@ -58,7 +58,7 @@ module RestClient
           env.merge!("HTTP_"+key.to_s.gsub("-", "_").upcase => value)
         end
         response = MockHTTPResponse.new(cache.call(env))
-        env['rack.errors'].close if env['rack.errors'].respond_to?(:close)
+        env['rack.errors'].close if env['rack.errors'].kind_of?(File)
         RestClient::Response.new(response.body, response)
       else
         super(additional_headers)
