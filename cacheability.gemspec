@@ -37,8 +37,7 @@ Gem::Specification.new do |s|
   s.summary = %q{A gem that makes client-side caching of HTTP requests a no-brainer. Replace your calls to RestClient::Resource.new with RestClient::CacheableResource.new and the caching is taken care of for you ! Supports heap, file and memcache storage.}
   s.test_files = [
     "spec/cacheability_spec.rb",
-     "spec/spec_helper.rb",
-     "spec/test.rb"
+     "spec/spec_helper.rb"
   ]
 
   if s.respond_to? :specification_version then
