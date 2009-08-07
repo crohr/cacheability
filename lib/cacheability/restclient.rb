@@ -24,7 +24,7 @@ module RestClient
   
   class CacheableResource < Resource
     attr_reader :cache
-    CACHE_DEFAULT_OPTIONS = {:verbose => true}.freeze
+    CACHE_DEFAULT_OPTIONS = {:verbose => false}
     
     def initialize(*args)
       super(*args)
@@ -52,12 +52,13 @@ module RestClient
           "rack.multiprocess" => true,
           "rack.url_scheme" => uri.scheme,
           "rack.input" => StringIO.new,
-          "rack.errors" => StringIO.new   # Rack-Cache writes errors into this field
+          "rack.errors" => logger   # Rack-Cache writes errors into this field
         }
         debeautify_headers(additional_headers).each do |key, value|
           env.merge!("HTTP_"+key.to_s.gsub("-", "_").upcase => value)
         end
         response = MockHTTPResponse.new(cache.call(env))
+        env['rack.errors'].close if env['rack.errors'].respond_to?(:close)
         RestClient::Response.new(response.body, response)
       else
         super(additional_headers)
@@ -88,5 +89,17 @@ module RestClient
       response = RestClient::Response.new("", e.response)
       [304, debeautify_headers( response.headers ), [response.to_s]]
     end
+    
+    # Ugly, but waiting for RestClient to become smarter
+    #
+    def logger
+      return StringIO.new unless log_to = RestClient.log
+      case log_to
+      when 'stdout' then STDOUT
+      when 'stderr' then STDERR
+      else
+        File.new(log_to, 'a')
+      end
+		end
   end
 end

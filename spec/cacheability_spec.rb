@@ -7,6 +7,7 @@ describe RestClient::CacheableResource do
   require File.dirname(__FILE__) + '/../lib/cacheability/restclient'
   before do
     @cache_options = {:metastore => 'file:/tmp/cache/meta', :entitystore => 'file:/tmp/cache/body'}
+    RestClient.log = nil
   end
   
   it "should instantiate the cache at init" do
@@ -60,7 +61,7 @@ describe RestClient::CacheableResource do
     it "should render a RestClient::Response even when the data is coming from the cache" do
       @resource.cache.should_receive(:call).and_return([200, {'ADDITIONAL_HEADER' => 'whatever'}, "body"])
       response = @resource.get({'HTTP_ADDITIONAL_HEADER' => 'whatever'}, true)
-      response.should be_is_a(RestClient::Response)
+      response.should be_a(RestClient::Response)
       response.code.should == 200
       response.headers.should == {:ADDITIONAL_HEADER => 'whatever'}
       response.to_s.should == "body"
