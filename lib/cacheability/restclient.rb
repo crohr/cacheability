@@ -14,13 +14,17 @@ module RestClient
     end
     
     def to_hash
-      @headers
+      @headers.inject({}) {|out, (key, value)|
+        # In Net::HTTP, headers values are arrays
+        out[key] = value.split(", ")
+        out
+      }
     end    
   end
   
   class CacheableResource < Resource
     attr_reader :cache
-    CACHE_DEFAULT_OPTIONS = {}.freeze
+    CACHE_DEFAULT_OPTIONS = {:verbose => true}.freeze
     
     def initialize(*args)
       super(*args)
@@ -80,7 +84,9 @@ module RestClient
       response.headers.delete(:x_content_digest) # don't know why, but it seems to make the validation fail if kept...
       [response.code, debeautify_headers( response.headers ), [response.to_s]]
     rescue RestClient::NotModified => e
-      [304, e.response.to_hash, [""]]
+      # e is a Net::HTTPResponse
+      response = RestClient::Response.new("", e.response)
+      [304, debeautify_headers( response.headers ), [response.to_s]]
     end
   end
 end

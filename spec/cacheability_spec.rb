@@ -21,7 +21,7 @@ describe RestClient::CacheableResource do
     before do
       @mock_cache = mock('rack-cache singleton')
       @mock_rack_errors = mock('string io')
-      @mock_304_net_http_response = mock('http response', :code => 304, :body => "", :to_hash => {'header1' => 'value1'})
+      @mock_304_net_http_response = mock('http response', :code => 304, :body => "", :to_hash => {'header1' => ['value1', 'value2']})
       Rack::Cache.stub!(:new).and_return(@mock_cache)
       @env = {
         'REQUEST_METHOD' => 'GET',
@@ -48,13 +48,13 @@ describe RestClient::CacheableResource do
     it "should call the backend (bypassing the cache) if the requested resource is not in the cache" do
       @resource.should_receive(:get).with({'ADDITIONAL-HEADER' => 'whatever'}, false).and_return(mock('rest-client response', :headers => {}, :code => 200, :to_s => 'body'))
       response = @resource.call(@env.merge({'HTTP_ADDITIONAL_HEADER' => 'whatever'}))
-      response.should == [200, {}, "body"]
+      response.should == [200, {}, ["body"]]
     end
     
     it "should return a 304 not modified response if the call to the backend returned a 304 not modified response" do
       @resource.should_receive(:get).with({'ADDITIONAL-HEADER' => 'whatever'}, false).and_raise(RestClient::NotModified.new(@mock_304_net_http_response))
       response = @resource.call(@env.merge({'HTTP_ADDITIONAL_HEADER' => 'whatever'}))
-      response.should == [304, {"header1"=>"value1"}, ""]
+      response.should == [304, {"header1"=>"value1"}, [""]]
     end
     
     it "should render a RestClient::Response even when the data is coming from the cache" do
