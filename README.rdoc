@@ -2,30 +2,45 @@
 
 A gem that makes client-side caching of HTTP requests a no-brainer. It is built upon the Rack:Cache gem from Ryan Tomayko.
 
-Cached data can be stored in heap, file or memcached. See the Rack::Cache documentation (http://tomayko.com/src/rack-cache/) for more information.
+Cached data can be stored in heap, file or memcached. See the rack-cache[http://tomayko.com/src/rack-cache] documentation for more information.
+
+Currently, cacheability comes with a rest-client[http://github.com/archiloque/rest-client] adapter, but the principle is easily applicable to other HTTP libraries.
 
 = Installation
 
   gem install cacheability
   
 = Usage
+Using the rest-client HTTP library, you just need to require the restclient adapter and enable the caching component:
 
-  require 'cacheability/restclient'
+  require 'cacheability/restclient'  
+  # Enable the caching component, and store both meta and entity data in files:
+  # See http://tomayko.com/src/rack-cache/configuration for the list of available options
+  RestClient.enable :caching, 
+                    :metastore => 'file:/tmp/cache/meta', 
+                    :entitystore => 'file:/tmp/cache/body'
+
+  # ... done !
+  # Then you can make your requests as usual, and the resources will be automatically and transparently cached for you according to their HTTP headers.
+  # Cache invalidation on requests other than GET is also transparently supported, thanks to Rack::Cache. Enjoy !
+
+  RestClient.get 'http://some/cacheable/resource'
+  # or
+  resource = RestClient::Resource.new('http://some/cacheable/resource')
   
-  RestClient.log = 'stdout' # displays requests and status codes
-  
-  resource = RestClient::CacheableResource.new(  'http://some/cacheable/resource', 
-                                                  :cache => { :metastore => 'file:/tmp/cache/meta', 
-                                                              :entitystore => 'file:/tmp/cache/body' } 
-                                              )
-  resource.get # get from remote server, and cache if possible
-  # ...
+  # obviously, caching is only interesting if you request the same resource multiple times, e.g. :
+  resource.get # get from origin server, and cache if possible
   resource.get # get from cache, if still fresh.
+  resource.put(...) # will automatically invalidate the cache, so that a subsequent GET request on the same resource does not return the cached resource
+  resource.get # get from origin server, and cache if possible
   # ...
-  resource.get(:cache_control => 'no-cache') # explicitly tells to bypass the cache, requires rack-cache >= 0.4
+  resource.get(:cache_control => 'no-cache') # explicitly tells to bypass the cache, requires rack-cache >= 0.5 and :allow_reload => true option
   # ...
+  resource.delete(...) # will invalidate the cache
+  resource.get # should return 404
 
-Do yourself a favor and read: 
+
+Now, you just need to make your resources cacheable, so unless you've already taken care of that, do yourself a favor and read: 
 * the HTTP specification related to HTTP caching - http://www.w3.org/Protocols/rfc2616/rfc2616-sec13.html
 * Things Caches Do - http://tomayko.com/writings/things-caches-do
 
@@ -36,7 +51,7 @@ Do yourself a favor and read:
 
 = Dependencies
 
-* rack-cache
+* rack-cache >= 0.5
 
 = TODO
 
