@@ -91,19 +91,20 @@ module RestClient
 	
   # A class that mocks the behaviour of a Net::HTTPResponse class.
   # It is required since RestClient::Response must be initialized with a class that responds to :code and :to_hash.
-  class MockNetHTTPResponse < Rack::Response
-    HTTP_DATE_HEADERS = %w{date last-modified expires retry-after warning}
+  class MockNetHTTPResponse
+    attr_reader :body, :header, :status
     alias_method :code, :status
+    
+    def initialize(body, status, header)
+      @body = body
+      @status = status
+      @header = header
+    end
 
     def to_hash
       @header.inject({}) {|out, (key, value)|
         # In Net::HTTP, header values are arrays
-        k = key.downcase
-        if HTTP_DATE_HEADERS.include?(k)
-          out[k] = [value]
-        else
-          out[k] = value.split(", ")
-        end
+        out[key.downcase] = [value]
         out
       }
     end    
@@ -114,7 +115,7 @@ module RestClient
       # get the original args needed to execute the request
       response = Request.original_execute(env['cacheability.args']) 
       # to satisfy Rack::Lint
-      response.headers.delete(:status) 
+      response.headers.delete(:status)
       [response.code, RestClient.debeautify_headers( response.headers ), [response.to_s]]
     rescue RestClient::NotModified => e
        # e is a Net::HTTPResponse

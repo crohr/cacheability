@@ -37,7 +37,7 @@ Using the rest-client HTTP library, you just need to require the restclient adap
   resource.get(:cache_control => 'no-cache') # explicitly tells to bypass the cache, requires rack-cache >= 0.5 and :allow_reload => true option
   # ...
   resource.delete(...) # will invalidate the cache
-  resource.get # should return 404
+  resource.get # should raise a RestClient::ResourceNotFound exception
 
 
 Now, you just need to make your resources cacheable, so unless you've already taken care of that, do yourself a favor and read: 

@@ -38,22 +38,22 @@ describe "Cacheability for RestClient" do
       resource = RestClient::Resource.new('http://domain.tld:8888/some/cacheable/resource?q1=a&q2=b')
       RestClient.components[:caching].should_receive(:call).with( 
         hash_including( {'HTTP_ADDITIONAL_HEADER' => 'whatever', "cacheability.args"=>{:url=>"http://domain.tld:8888/some/cacheable/resource?q1=a&q2=b", :method=>:get, :headers=>{:additional_header=>"whatever"}}}) 
-      ).and_return([200, {"Content-Type" => "text/plain"}, "response body"])
+      ).and_return([200, {"Content-Type" => "text/plain", "Content-Length" => "13", "Allow" => "GET, POST", "Date" => "Mon, 04 Jan 2010 13:37:18 GMT"}, ["response body"]])
       response = resource.get(:additional_header => 'whatever')
       response.should be_a(RestClient::Response)
       response.code.should == 200
-      response.headers.should == {:content_type=>"text/plain", :content_length=>"13"}
+      response.headers.should == {:content_type=>"text/plain", :content_length=>"13", :allow => "GET, POST", :date => "Mon, 04 Jan 2010 13:37:18 GMT"}
       response.to_s.should == "response body"
     end
     
     it "should pass through the cache [using RestClient class methods]" do
       RestClient.components[:caching].should_receive(:call).with( 
         hash_including( {'HTTP_ADDITIONAL_HEADER' => 'whatever', "cacheability.args"=>{:url=>"http://domain.tld:8888/some/cacheable/resource?q1=a&q2=b", :method=>:get, :headers=>{:additional_header=>"whatever"}}}) 
-      ).and_return([200, {"Content-Type" => "text/plain"}, "response body"])
+      ).and_return([200, {"Content-Type" => "text/plain", "Content-Length" => "13", "Allow" => "GET, POST", "Date" => "Mon, 04 Jan 2010 13:37:18 GMT"}, ["response body"]])
       response = RestClient.get('http://domain.tld:8888/some/cacheable/resource?q1=a&q2=b', :additional_header => 'whatever')
       response.should be_a(RestClient::Response)
       response.code.should == 200
-      response.headers.should == {:content_type=>"text/plain", :content_length=>"13"}
+      response.headers.should == {:content_type=>"text/plain", :content_length=>"13", :allow => "GET, POST", :date => "Mon, 04 Jan 2010 13:37:18 GMT"}
       response.to_s.should == "response body"
     end
   
