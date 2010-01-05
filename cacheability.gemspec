@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{cacheability}
-  s.version = "2.0.0"
+  s.version = "2.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Cyril Rohr"]
-  s.date = %q{2010-01-04}
+  s.date = %q{2010-01-05}
   s.description = %q{Transparent caching for your HTTP requests (heap, file, memcache). Cache invalidation on non-GET requests is supported. Built-in support for RestClient. Built upon Rack::Cache.}
   s.email = %q{cyril.rohr@gmail.com}
   s.extra_rdoc_files = [
@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION.yml",
      "cacheability.gemspec",
+     "examples/grid5000.rb",
      "lib/cacheability.rb",
      "lib/cacheability/restclient.rb",
      "spec/cacheability_spec.rb",
@@ -35,7 +36,8 @@ Gem::Specification.new do |s|
   s.summary = %q{A gem that makes client-side caching of HTTP requests a no-brainer. Drop-in adapter for the rest-client gem with a single line: RestClient.enable(:caching) ! Supports heap, file and memcache storage, and cache invalidation on non-GET requests.}
   s.test_files = [
     "spec/cacheability_spec.rb",
-     "spec/spec_helper.rb"
+     "spec/spec_helper.rb",
+     "examples/grid5000.rb"
   ]
 
   if s.respond_to? :specification_version then
